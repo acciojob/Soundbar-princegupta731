@@ -1,25 +1,35 @@
-//your JS code here. If required.
-// Select all buttons and the stop button
 const buttons = document.querySelectorAll('.btn');
 const stopButton = document.querySelector('.stop');
 let currentAudio = null;
 
-// Play the corresponding sound when a button is clicked
 buttons.forEach(button => {
   button.addEventListener('click', () => {
     const soundName = button.getAttribute('data-sound');
-    const audio = new Audio(`sounds/${soundName}.mp3`);
-    
-    if (currentAudio) currentAudio.pause(); // Stop currently playing audio
+    const audioPath = `sounds/${soundName}.mp3`;
+    const audio = new Audio(audioPath);
+
+    // Handle missing or unsupported audio
+    audio.addEventListener('error', () => {
+      console.warn(`Failed to load audio: ${audioPath}`);
+    });
+
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+
     currentAudio = audio;
-    audio.play();
+
+    // Safe playback
+    audio.play().catch(err => {
+      console.warn('Audio playback failed:', err);
+    });
   });
 });
 
-// Stop sound when Stop button is clicked
 stopButton.addEventListener('click', () => {
   if (currentAudio) {
     currentAudio.pause();
-    currentAudio.currentTime = 0; // Reset to start
+    currentAudio.currentTime = 0;
   }
 });
